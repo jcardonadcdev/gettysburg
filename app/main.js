@@ -60,7 +60,7 @@ function init() {
 	
 	// home extent
 
-	_homeExtent = new esri.geometry.Extent({"xmin":-8602478,"ymin":4840543,"xmax":-8597896,"ymax":4843194,"spatialReference":{"wkid":102100}});	
+	_homeExtent = new esri.geometry.Extent({"xmin": -8601570, "ymin": 4840603, "xmax": -8598512, "ymax": 4842629, "spatialReference":{"wkid":102100}});	
 	
 	// jQuery event assignment
 	

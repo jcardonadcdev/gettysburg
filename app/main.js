@@ -212,10 +212,10 @@ function hoverInfoPos(x,y){
 
 
 function handleWindowResize() {
+	/*
 	if ((($("body").height() <= 500) || ($("body").width() <= 800)) || _isEmbed) $("#header").height(0);
 	else $("#header").height(115);
-	
-	$("#map").height($("body").height() - $("#header").height());
+	*/
 	$("#map").width($("body").width() - $("#left").width() - $("#middle").width());
 	_map.resize();
 }

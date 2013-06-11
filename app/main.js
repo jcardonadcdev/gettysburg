@@ -132,7 +132,7 @@ function initMap() {
 	*/
 	
 	handleWindowResize();
-	$("#whiteOut").fadeOut();
+	setTimeout(function(){_map.setExtent(_homeExtent);$("#whiteOut").fadeOut()},500);
 	
 }
 
@@ -216,6 +216,6 @@ function handleWindowResize() {
 	else $("#header").height(115);
 	
 	$("#map").height($("body").height() - $("#header").height());
-	$("#map").width($("body").width());
+	$("#map").width($("body").width() - $("#left").width() - $("#middle").width());
 	_map.resize();
 }

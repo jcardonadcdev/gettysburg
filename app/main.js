@@ -7,7 +7,7 @@ dojo.require("esri.map");
 ***************** begin config section ****************
 *******************************************************/
 
-var TITLE = "This is the title."
+var TITLE = "Battle of Gettysburg"
 var BYLINE = "This is the byline"
 var WEBMAP_ID = "3732b8a6d0bc4a09b00247e8daf69af8";
 var GEOMETRY_SERVICE_URL = "http://tasks.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer";
@@ -57,6 +57,10 @@ function init() {
 			}
 		}
 	}
+	
+	// home extent
+
+	_homeExtent = new esri.geometry.Extent({"xmin":-8602478,"ymin":4840543,"xmax":-8597896,"ymax":4843194,"spatialReference":{"wkid":102100}});	
 	
 	// jQuery event assignment
 	

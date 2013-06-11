@@ -114,13 +114,13 @@ a:hover{
 }
 
 #map {
-	position:relative;
+	position:absolute;
+	right:0;
 	border:none;
 	padding:0;
 	height:100%;
 	width:100%;
 	overflow:hidden;
-	float:right;
 }
 
 #hoverInfo{

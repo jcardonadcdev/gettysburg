@@ -216,6 +216,7 @@ function handleWindowResize() {
 	if ((($("body").height() <= 500) || ($("body").width() <= 800)) || _isEmbed) $("#header").height(0);
 	else $("#header").height(115);
 	*/
+	$("#days").height($("body").height() - $("#play").height() - 50);
 	$("#map").width($("body").width() - $("#left").width() - $("#middle").width());
 	_map.resize();
 }

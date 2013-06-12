@@ -155,5 +155,11 @@ a:hover{
 
 .timepoint{
 	margin-top:-10px;
+	margin-left:-15px;
+	width:30px;
+	height:21px;
+	cursor:pointer;
+	position:absolute; 
+	left:125px;
 }
 

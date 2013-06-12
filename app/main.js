@@ -28,17 +28,6 @@ var _isMobile = isMobile();
 
 var _isEmbed = false;
 
-/*
-
-might need this if you're using icons.
-
-var _lutBallIconSpecs = {
-	tiny:new IconSpecs(24,24,12,12),
-	medium:new IconSpecs(30,30,15,15),
-	large:new IconSpecs(30,30,15,15)
-}
-*/
-
 dojo.addOnLoad(function() {_dojoReady = true;init()});
 jQuery(document).ready(function() {_jqueryReady = true;init()});
 
@@ -130,6 +119,32 @@ function initMap() {
 	dojo.connect(_layerOV, "onMouseOut", layerOV_onMouseOut);
 	dojo.connect(_layerOV, "onClick", layerOV_onClick);		
 	*/
+	
+	$(".timepoint").mouseover(function(e) {
+		if (_isMobile) return;
+		$(event.target).width(40);
+		$(event.target).height(28);		
+		$(event.target).css("margin-left", -20);		
+		$(event.target).css("margin-top", -14);								
+		/*
+		if (!_isIE) moveGraphicToFront(graphic);	
+		$("#hoverInfo").html("<b>"+graphic.attributes.getLanguage()+"</b>"+"<p>"+graphic.attributes.getRegion());
+		var pt = _map.toScreen(graphic.geometry);
+		hoverInfoPos(pt.x,pt.y);	
+		*/
+    });
+	
+	$(".timepoint").mouseout(function(e) {
+		$(event.target).width(30);
+		$(event.target).height(21);		
+		$(event.target).css("margin-left", -15);		
+		$(event.target).css("margin-top", -10);								
+    });
+	
+	$(".timepoint").click(function(e) {
+		$(".timepoint").attr("src", "resources/icons/Ltblu.png");
+		$(event.target).attr("src", "resources/icons/Red.png");
+    });
 	
 	handleWindowResize();
 	setTimeout(function(){_map.setExtent(_homeExtent);$("#whiteOut").fadeOut()},500);

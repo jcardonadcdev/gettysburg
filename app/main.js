@@ -10,6 +10,8 @@ var SERVICE_TROOPS = "http://staging.storymaps.esri.com/arcgis/rest/services/Get
 
 var _map;
 
+var _layerTroops1;
+
 var _dojoReady = false;
 var _jqueryReady = false;
 
@@ -68,7 +70,8 @@ function init() {
 	layerBasemap.setOpacity(0.5);
 	_map.addLayer(layerBasemap);
 	
-	_map.addLayer(new esri.layers.ArcGISDynamicMapServiceLayer(SERVICE_TROOPS));	
+	_layerTroops1 = new esri.layers.ArcGISDynamicMapServiceLayer(SERVICE_TROOPS);
+	_map.addLayer(_layerTroops1);	
 
 	if(_map.loaded){
 		initMap();
@@ -131,6 +134,16 @@ function initMap() {
 	$(".timepoint").click(function(e) {
 		$(".timepoint").attr("src", "resources/icons/Ltblu.png");
 		$(event.target).attr("src", "resources/icons/Red.png");
+		
+		// turn on the active layer and sublayers
+		
+		var index = $.inArray(event.target, $(".timepoint"));		
+		var activeLayer = $.grep(_layerTroops1.layerInfos, function(n, i){return n.parentLayerId == -1})[index];
+		var subLayers = $.grep(_layerTroops1.layerInfos, function(n, i){return n.parentLayerId == activeLayer.id});
+		var visibleLayers = [activeLayer.id];		
+		$.each(subLayers, function(index, value){visibleLayers.push(value.id)});
+		_layerTroops1.setVisibleLayers(visibleLayers);
+		
     });
 	
 	handleWindowResize();

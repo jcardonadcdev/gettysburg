@@ -112,10 +112,10 @@ function initMap() {
 	
 	$(".timepoint").mouseover(function(e) {
 		if (_isMobile) return;
-		$(event.target).width(40);
-		$(event.target).height(28);		
-		$(event.target).css("margin-left", -20);		
-		$(event.target).css("margin-top", -14);								
+		$(e.target).width(40);
+		$(e.target).height(28);		
+		$(e.target).css("margin-left", -20);		
+		$(e.target).css("margin-top", -14);								
 		/*
 		if (!_isIE) moveGraphicToFront(graphic);	
 		$("#hoverInfo").html("<b>"+graphic.attributes.getLanguage()+"</b>"+"<p>"+graphic.attributes.getRegion());
@@ -125,19 +125,19 @@ function initMap() {
     });
 	
 	$(".timepoint").mouseout(function(e) {
-		$(event.target).width(30);
-		$(event.target).height(21);		
-		$(event.target).css("margin-left", -15);		
-		$(event.target).css("margin-top", -10);								
+		$(e.target).width(30);
+		$(e.target).height(21);		
+		$(e.target).css("margin-left", -15);		
+		$(e.target).css("margin-top", -10);								
     });
 	
 	$(".timepoint").click(function(e) {
 		$(".timepoint").attr("src", "resources/icons/Ltblu.png");
-		$(event.target).attr("src", "resources/icons/Red.png");
+		$(e.target).attr("src", "resources/icons/Red.png");
 		
 		// turn on the active layer and sublayers
 		
-		var index = $.inArray(event.target, $(".timepoint"));		
+		var index = $.inArray(e.target, $(".timepoint"));		
 		var activeLayer = $.grep(_layerTroops1.layerInfos, function(n, i){return n.parentLayerId == -1})[index];
 		var subLayers = $.grep(_layerTroops1.layerInfos, function(n, i){return n.parentLayerId == activeLayer.id});
 		var visibleLayers = [activeLayer.id];		

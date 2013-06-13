@@ -3,18 +3,10 @@ dojo.require("dijit.layout.ContentPane");
 dojo.require("esri.arcgis.utils");
 dojo.require("esri.map");
 
-/******************************************************
-***************** begin config section ****************
-*******************************************************/
-
 var TITLE = "Battle of Gettysburg"
 var BYLINE = "This is the byline"
-var WEBMAP_ID = "3732b8a6d0bc4a09b00247e8daf69af8";
-var GEOMETRY_SERVICE_URL = "http://tasks.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer";
-
-/******************************************************
-***************** end config section ******************
-*******************************************************/
+var BASEMAP_SERVICE_GETTYSBURG = "http://staging.storymaps.esri.com/arcgis/rest/services/Gettysburg/GettysburgBasemaps/MapServer";
+var SERVICE_TROOPS = "http://staging.storymaps.esri.com/arcgis/rest/services/Gettysburg/GettysburgTroops/MapServer";
 
 var _map;
 
@@ -49,7 +41,7 @@ function init() {
 	
 	// home extent
 
-	_homeExtent = new esri.geometry.Extent({"xmin": -8601570, "ymin": 4840603, "xmax": -8598512, "ymax": 4842629, "spatialReference":{"wkid":102100}});	
+	_homeExtent = new esri.geometry.Extent({"xmin": -8602342.07582184, "ymin": 4835101.147848479, "xmax": -8594602.826707974, "ymax": 4844302.255128294, "spatialReference":{"wkid":102100}});	
 	
 	// jQuery event assignment
 	
@@ -68,29 +60,24 @@ function init() {
 	$("#title").append(TITLE);
 	$("#subtitle").append(BYLINE);	
 
-	var mapDeferred = esri.arcgis.utils.createMap(WEBMAP_ID, "map", {
-		mapOptions: {
-			slider: false,
-			wrapAround180: true,
-			extent:_homeExtent
-		},
-		ignorePopups: false,
-		geometryServiceURL: GEOMETRY_SERVICE_URL
+	_map = new esri.Map("map", {
+		slider:false, 
 	});
 	
-	mapDeferred.addCallback(function(response) {	  
+	var layerBasemap = new esri.layers.ArcGISTiledMapServiceLayer(BASEMAP_SERVICE_GETTYSBURG);
+	layerBasemap.setOpacity(0.5);
+	_map.addLayer(layerBasemap);
+	
+	_map.addLayer(new esri.layers.ArcGISDynamicMapServiceLayer(SERVICE_TROOPS));	
 
-		_map = response.map;
-
-		if(_map.loaded){
+	if(_map.loaded){
+		initMap();
+	} else {
+		dojo.connect(_map,"onLoad",function(){
 			initMap();
-		} else {
-			dojo.connect(_map,"onLoad",function(){
-				initMap();
-			});
-		}
-				
-	});
+		});
+	}
+	
 	
 }
 

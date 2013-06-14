@@ -142,12 +142,8 @@ function initMap() {
 	$(".timepoint").click(function(e) {
 		$(".timepoint").attr("src", "resources/icons/Ltblu.png");
 		$(e.target).attr("src", "resources/icons/Red.png");
-		
-		// turn on the active layer and sublayers
-		
 		var index = $.inArray(e.target, $(".timepoint"));
 		stageTroops(index);		
-		
     });
 	
 	handleWindowResize();
@@ -171,9 +167,9 @@ function stageTroops(index)
 
 function createVisibleLayers(index)
 {
-	var activeLayer = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.parentLayerId == -1})[index];
-	var subLayers = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.parentLayerId == activeLayer.id});
-	var visibleLayers = [activeLayer.id];		
+	var parentLayer = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.parentLayerId == -1})[index];
+	var subLayers = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.parentLayerId == parentLayer.id});
+	var visibleLayers = [parentLayer.id];		
 	$.each(subLayers, function(index, value){visibleLayers.push(value.id)});
 	return visibleLayers;
 }

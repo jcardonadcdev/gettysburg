@@ -143,30 +143,39 @@ function initMap() {
 		$(".timepoint").attr("src", "resources/icons/Ltblu.png");
 		$(e.target).attr("src", "resources/icons/Red.png");
 		
-		swap();
-		
 		// turn on the active layer and sublayers
 		
-		var index = $.inArray(e.target, $(".timepoint"));		
-		var activeLayer = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.parentLayerId == -1})[index];
-		var subLayers = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.parentLayerId == activeLayer.id});
-		var visibleLayers = [activeLayer.id];		
-		$.each(subLayers, function(index, value){visibleLayers.push(value.id)});
-		var handle = dojo.connect(_layerTroopsActive, "onUpdateEnd", function(e){
-			// for some reason, it's necessary to re-set the display to none; otherwise,
-			// the layer just turns on abruptly.
-			$(_layerTroopsActive._div).css("display", "none");
-			crossFade();
-			dojo.disconnect(handle)
-		});
-		_layerTroopsActive.setVisibleLayers(visibleLayers);
-		_layerTroopsActive.setVisibility(true);
+		var index = $.inArray(e.target, $(".timepoint"));
+		stageTroops(index);		
 		
     });
 	
 	handleWindowResize();
 	setTimeout(function(){_map.setExtent(_homeExtent);$("#whiteOut").fadeOut()},500);
 	
+}
+
+function stageTroops(index)
+{
+	swap();
+	var handle = dojo.connect(_layerTroopsActive, "onUpdateEnd", function(e){
+		// for some reason, it's necessary to re-set the display to none; otherwise,
+		// the layer just turns on abruptly.
+		$(_layerTroopsActive._div).css("display", "none");
+		crossFade();
+		dojo.disconnect(handle)
+	});
+	_layerTroopsActive.setVisibleLayers(createVisibleLayers(index));
+	_layerTroopsActive.setVisibility(true);
+}
+
+function createVisibleLayers(index)
+{
+	var activeLayer = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.parentLayerId == -1})[index];
+	var subLayers = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.parentLayerId == activeLayer.id});
+	var visibleLayers = [activeLayer.id];		
+	$.each(subLayers, function(index, value){visibleLayers.push(value.id)});
+	return visibleLayers;
 }
 
 function crossFade()

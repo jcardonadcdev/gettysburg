@@ -10,7 +10,8 @@ var SERVICE_TROOPS = "http://staging.storymaps.esri.com/arcgis/rest/services/Get
 
 var _map;
 
-var _layerTroops1;
+var _layerTroopsActive;
+var _layerTroopsInactive;
 
 var _dojoReady = false;
 var _jqueryReady = false;
@@ -70,8 +71,13 @@ function init() {
 	layerBasemap.setOpacity(0.5);
 	_map.addLayer(layerBasemap);
 	
-	_layerTroops1 = new esri.layers.ArcGISDynamicMapServiceLayer(SERVICE_TROOPS);
-	_map.addLayer(_layerTroops1);	
+	_layerTroopsActive = new esri.layers.ArcGISDynamicMapServiceLayer(SERVICE_TROOPS);
+	_map.addLayer(_layerTroopsActive);	
+	
+	_layerTroopsInactive = new esri.layers.ArcGISDynamicMapServiceLayer(SERVICE_TROOPS);
+	_layerTroopsInactive.setVisibility(false);
+	_map.addLayer(_layerTroopsInactive);	
+
 
 	if(_map.loaded){
 		initMap();
@@ -100,6 +106,8 @@ function initMap() {
 			},500);
 		}	
 	}
+	
+	setTimeout(function(){$(_layerTroopsInactive._div).fadeOut()}, 500);
 	
 	/*
 	
@@ -135,20 +143,40 @@ function initMap() {
 		$(".timepoint").attr("src", "resources/icons/Ltblu.png");
 		$(e.target).attr("src", "resources/icons/Red.png");
 		
+		swap();
+		
 		// turn on the active layer and sublayers
 		
 		var index = $.inArray(e.target, $(".timepoint"));		
-		var activeLayer = $.grep(_layerTroops1.layerInfos, function(n, i){return n.parentLayerId == -1})[index];
-		var subLayers = $.grep(_layerTroops1.layerInfos, function(n, i){return n.parentLayerId == activeLayer.id});
+		var activeLayer = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.parentLayerId == -1})[index];
+		var subLayers = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.parentLayerId == activeLayer.id});
 		var visibleLayers = [activeLayer.id];		
 		$.each(subLayers, function(index, value){visibleLayers.push(value.id)});
-		_layerTroops1.setVisibleLayers(visibleLayers);
+		var handle = dojo.connect(_layerTroopsActive, "onUpdateEnd", function(e){
+			crossFade();
+			dojo.disconnect(handle)
+		});
+		_layerTroopsActive.setVisibleLayers(visibleLayers);
+		_layerTroopsActive.setVisibility(true);
 		
     });
 	
 	handleWindowResize();
 	setTimeout(function(){_map.setExtent(_homeExtent);$("#whiteOut").fadeOut()},500);
 	
+}
+
+function crossFade()
+{
+	$(_layerTroopsActive._div).fadeIn();
+	$(_layerTroopsInactive._div).fadeOut(1000, null, function(){_layerTroopsInactive.setVisibility(false)});
+}
+
+function swap() 
+{
+	var temp = _layerTroopsInactive;
+	_layerTroopsInactive = _layerTroopsActive;
+	_layerTroopsActive = temp;
 }
 
 /*

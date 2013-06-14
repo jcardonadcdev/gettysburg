@@ -153,6 +153,9 @@ function initMap() {
 		var visibleLayers = [activeLayer.id];		
 		$.each(subLayers, function(index, value){visibleLayers.push(value.id)});
 		var handle = dojo.connect(_layerTroopsActive, "onUpdateEnd", function(e){
+			// for some reason, it's necessary to re-set the display to none; otherwise,
+			// the layer just turns on abruptly.
+			$(_layerTroopsActive._div).css("display", "none");
 			crossFade();
 			dojo.disconnect(handle)
 		});
@@ -169,6 +172,8 @@ function initMap() {
 function crossFade()
 {
 	$(_layerTroopsActive._div).fadeIn();
+	// turn off the inactive layer (even though the display should be "none" after the fadeOut).  we
+	// don't want it making unnecessary fetches.
 	$(_layerTroopsInactive._div).fadeOut(1000, null, function(){_layerTroopsInactive.setVisibility(false)});
 }
 

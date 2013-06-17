@@ -15,9 +15,12 @@ var SPREADSHEET_FIELDNAME_BATTLEDAY = "Battle Day";
 var SPREADSHEET_FIELDNAME_MAPNO = "Batchelder Map No.";
 var SPREADSHEET_FIELDNAME_DATE = "Date";
 var SPREADSHEET_FIELDNAME_TIME = "Time";
+var SPREADSHEET_FIELDNAME_TIME24 = "Time24";
 var SPREADSHEET_FIELDNAME_PANOVIEW = "Pano View";
 var SPREADSHEET_FIELDNAME_POV = "Point of View";
 var SPREADSHEET_FIELDNAME_DESCRIPTION = "Description";
+
+var _recsSpreadSheet;
 
 var _map;
 
@@ -113,15 +116,59 @@ function init() {
 			SPREADSHEET_FIELDNAME_MAPNO,
 			SPREADSHEET_FIELDNAME_DATE,
 			SPREADSHEET_FIELDNAME_TIME, 
+			SPREADSHEET_FIELDNAME_TIME24, 
 			SPREADSHEET_FIELDNAME_PANOVIEW,
 			SPREADSHEET_FIELDNAME_POV,
 			SPREADSHEET_FIELDNAME_DESCRIPTION
 		);
-		console.log(parser.getRecs(serviceCSV.getLines()));
+		_recsSpreadSheet = parser.getRecs(serviceCSV.getLines());
+		var begin = new Date(1863, 6, 1, 0, 0 , 0, 0);
+		var end = new Date(1863, 6, 4, 0, 0 , 0, 0);
+		var diff = (end.getTime() - begin.getTime())/1000;
+		
+		var current;
+		var tokens;
+		var img;
+		$.each(_recsSpreadSheet, function(index, value){
+			tokens = value[SPREADSHEET_FIELDNAME_TIME24].split(":");
+			current = new Date(1863, 6, value[SPREADSHEET_FIELDNAME_BATTLEDAY], tokens[0], tokens[1], tokens[2]);
+			img = $("<img></img>");
+			$(img).attr("src", "resources/icons/Ltblu.png");
+			$(img).css("top", parseInt((((current.getTime() - begin.getTime()) / 1000) / diff) * 100).toString()+"%");
+			$(img).addClass("timepoint");
+			$("#days").append(img);
+		});
+
+		$(".timepoint").mouseover(function(e) {
+			if (_isMobile) return;
+			$(e.target).width(40);
+			$(e.target).height(28);		
+			$(e.target).css("margin-left", -20);		
+			$(e.target).css("margin-top", -14);								
+			/*
+			if (!_isIE) moveGraphicToFront(graphic);	
+			$("#hoverInfo").html("<b>"+graphic.attributes.getLanguage()+"</b>"+"<p>"+graphic.attributes.getRegion());
+			var pt = _map.toScreen(graphic.geometry);
+			hoverInfoPos(pt.x,pt.y);	
+			*/
+		});
+		
+		$(".timepoint").mouseout(function(e) {
+			$(e.target).width(30);
+			$(e.target).height(21);		
+			$(e.target).css("margin-left", -15);		
+			$(e.target).css("margin-top", -10);								
+		});
+		
+		$(".timepoint").click(function(e) {
+			$(".timepoint").attr("src", "resources/icons/Ltblu.png");
+			$(e.target).attr("src", "resources/icons/Red.png");
+			var index = $.inArray(e.target, $(".timepoint"));
+			stageTroops(index);		
+		});
+		
 	});
 	serviceCSV.process(SPREADSHEET_URL);
-	
-	
 	
 }
 
@@ -152,35 +199,7 @@ function initMap() {
 	dojo.connect(_layerOV, "onMouseOut", layerOV_onMouseOut);
 	dojo.connect(_layerOV, "onClick", layerOV_onClick);		
 	*/
-	
-	$(".timepoint").mouseover(function(e) {
-		if (_isMobile) return;
-		$(e.target).width(40);
-		$(e.target).height(28);		
-		$(e.target).css("margin-left", -20);		
-		$(e.target).css("margin-top", -14);								
-		/*
-		if (!_isIE) moveGraphicToFront(graphic);	
-		$("#hoverInfo").html("<b>"+graphic.attributes.getLanguage()+"</b>"+"<p>"+graphic.attributes.getRegion());
-		var pt = _map.toScreen(graphic.geometry);
-		hoverInfoPos(pt.x,pt.y);	
-		*/
-    });
-	
-	$(".timepoint").mouseout(function(e) {
-		$(e.target).width(30);
-		$(e.target).height(21);		
-		$(e.target).css("margin-left", -15);		
-		$(e.target).css("margin-top", -10);								
-    });
-	
-	$(".timepoint").click(function(e) {
-		$(".timepoint").attr("src", "resources/icons/Ltblu.png");
-		$(e.target).attr("src", "resources/icons/Red.png");
-		var index = $.inArray(e.target, $(".timepoint"));
-		stageTroops(index);		
-    });
-	
+		
 	handleWindowResize();
 	setTimeout(function(){_map.setExtent(_homeExtent);$("#whiteOut").fadeOut()},500);
 	

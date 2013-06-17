@@ -8,6 +8,17 @@ var BYLINE = "This is the byline"
 var BASEMAP_SERVICE_GETTYSBURG = "http://staging.storymaps.esri.com/arcgis/rest/services/Gettysburg/GettysburgBasemaps/MapServer";
 var SERVICE_TROOPS = "http://staging.storymaps.esri.com/arcgis/rest/services/Gettysburg/GettysburgTroops/MapServer";
 
+var SPREADSHEET_URL = "/proxy/proxy.ashx?https://docs.google.com/spreadsheet/pub?key=0ApQt3h4b9AptdERtNnRDQU9wLWlNX1cyMXQybmQ2TUE&output=csv";
+
+var SPREADSHEET_FIELDNAME_ID = "ID";
+var SPREADSHEET_FIELDNAME_BATTLEDAY = "Battle Day";
+var SPREADSHEET_FIELDNAME_MAPNO = "Batchelder Map No.";
+var SPREADSHEET_FIELDNAME_DATE = "Date";
+var SPREADSHEET_FIELDNAME_TIME = "Time";
+var SPREADSHEET_FIELDNAME_PANOVIEW = "Pano View";
+var SPREADSHEET_FIELDNAME_POV = "Point of View";
+var SPREADSHEET_FIELDNAME_DESCRIPTION = "Description";
+
 var _map;
 
 var _layerTroopsActive;
@@ -92,6 +103,24 @@ function init() {
 			initMap();
 		});
 	}
+	
+	
+	var serviceCSV = new CSVService();
+	$(serviceCSV).bind("complete", function() {	
+		var parser = new ParserMain(
+			SPREADSHEET_FIELDNAME_ID, 
+			SPREADSHEET_FIELDNAME_BATTLEDAY,
+			SPREADSHEET_FIELDNAME_MAPNO,
+			SPREADSHEET_FIELDNAME_DATE,
+			SPREADSHEET_FIELDNAME_TIME, 
+			SPREADSHEET_FIELDNAME_PANOVIEW,
+			SPREADSHEET_FIELDNAME_POV,
+			SPREADSHEET_FIELDNAME_DESCRIPTION
+		);
+		console.log(parser.getRecs(serviceCSV.getLines()));
+	});
+	serviceCSV.process(SPREADSHEET_URL);
+	
 	
 	
 }

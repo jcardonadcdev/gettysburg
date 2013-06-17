@@ -22,6 +22,7 @@ var SPREADSHEET_FIELDNAME_POV = "Point of View";
 var SPREADSHEET_FIELDNAME_DESCRIPTION = "Description";
 
 var _recsSpreadSheet;
+var _selected = 0;
 
 var _map;
 
@@ -168,9 +169,12 @@ function init() {
 		$(".timepoint").click(function(e) {
 			$(".timepoint").attr("src", "resources/icons/Ltblu.png");
 			$(e.target).attr("src", "resources/icons/Red.png");
-			var index = $.inArray(e.target, $(".timepoint"));
-			stageTroops(_recsSpreadSheet[index][SPREADSHEET_FIELDNAME_LAYER]);		
+			_selected = $.inArray(e.target, $(".timepoint"));
+			stageTroops(_selected);		
 		});
+		
+		$($(".timepoint")[_selected]).attr("src", "resources/icons/Red.png");
+		stageTroops(_selected);
 		
 	});
 	serviceCSV.process(SPREADSHEET_URL);
@@ -210,8 +214,9 @@ function initMap() {
 	
 }
 
-function stageTroops(layerName)
+function stageTroops(index)
 {
+	var layerName = _recsSpreadSheet[index][SPREADSHEET_FIELDNAME_LAYER]
 	swap();
 	var handle = dojo.connect(_layerTroopsActive, "onUpdateEnd", function(e){
 		// for some reason, it's necessary to re-set the display to none; otherwise,

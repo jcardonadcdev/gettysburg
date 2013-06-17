@@ -1,23 +1,7 @@
 function ParserMain(lines)
 {
 	
-	var FIELDNAME_LONGITUDE = "Longitude";
-	var FIELDNAME_LATITUDE = "Latitude";	
-	var FIELDNAME_NAME = "Name";
-	var FIELDNAME_LANGUAGE_ID = "Language_ID";
-	var FIELDNAME_LANGUAGE = "Language";
-	var FIELDNAME_REGION = "Region";
-	var FIELDNAME_TEXT = "Text";
-	var FIELDNAME_PHOTO = "Photo";
-	var FIELDNAME_AUDIO = "Audio";
-	var FIELDNAME_VIDEO = "Video";
-	var FIELDNAME_LINK = "Link";
-	var FIELDNAME_CREDIT_PHOTO = "Credit_Photo";
-	var FIELDNAME_CREDIT_AUDIO = "Credit_Audio";
-	var FIELDNAME_CREDIT_VIDEO = "Credit_Video";
-	var FIELDNAME_MORE_INFO = "More_Info";
-	var FIELDNAME_MORE_INFO_URL = "More_Info_URL";
-	var FIELDNAME_NOTES = "Notes";
+	var SPREADSHEET_FIELDNAME_ID = "ID";
 	
 	var _recs = parseRecs(lines);
 	
@@ -40,26 +24,9 @@ function ParserMain(lines)
 			if (values.length == 1) {
 				break;
 			}
-	
-			rec = new RecordMain(
-				values[getFieldIndex(FIELDNAME_NAME,fields)],
-				parseInt(values[getFieldIndex(FIELDNAME_LANGUAGE_ID,fields)]),
-				values[getFieldIndex(FIELDNAME_LANGUAGE,fields)],
-				values[getFieldIndex(FIELDNAME_REGION,fields)],
-				values[getFieldIndex(FIELDNAME_LONGITUDE,fields)],
-				values[getFieldIndex(FIELDNAME_LATITUDE,fields)],
-				values[getFieldIndex(FIELDNAME_TEXT,fields)],
-				checkValue(values[getFieldIndex(FIELDNAME_PHOTO,fields)]),
-				checkValue(values[getFieldIndex(FIELDNAME_AUDIO,fields)]),
-				checkValue(values[getFieldIndex(FIELDNAME_VIDEO,fields)]),
-				values[getFieldIndex(FIELDNAME_LINK,fields)],
-				values[getFieldIndex(FIELDNAME_CREDIT_PHOTO,fields)],
-				values[getFieldIndex(FIELDNAME_CREDIT_AUDIO,fields)],
-				values[getFieldIndex(FIELDNAME_CREDIT_VIDEO,fields)],
-				values[getFieldIndex(FIELDNAME_MORE_INFO,fields)],
-				values[getFieldIndex(FIELDNAME_MORE_INFO_URL,fields)]
-			);
-			
+
+			rec = new Object();
+			rec[SPREADSHEET_FIELDNAME_ID] = values[getFieldIndex(SPREADSHEET_FIELDNAME_ID, fields)];
 			recs.push(rec);
 	
 		}	

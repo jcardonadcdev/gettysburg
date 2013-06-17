@@ -1,13 +1,16 @@
-function ParserMain(lines)
+function ParserMain(_fieldName_ID, 
+					_fieldName_BattleDay, 
+					_fieldName_MapNo, 
+					_fieldName_Date, 
+					_fieldName_Time, 
+					_fieldName_PanoView, 
+					_fieldName_POV, 
+					_fieldName_Description)
 {
 	
-	var SPREADSHEET_FIELDNAME_ID = "ID";
-	
-	var _recs = parseRecs(lines);
-	
-	this.getRecs = function()
+	this.getRecs = function(lines)
 	{
-		return _recs;
+		return parseRecs(lines);
 	}
 		
 	function parseRecs(lines) 
@@ -26,7 +29,14 @@ function ParserMain(lines)
 			}
 
 			rec = new Object();
-			rec[SPREADSHEET_FIELDNAME_ID] = values[getFieldIndex(SPREADSHEET_FIELDNAME_ID, fields)];
+			rec[_fieldName_ID] = values[getFieldIndex(_fieldName_ID, fields)];
+			rec[_fieldName_BattleDay] = values[getFieldIndex(_fieldName_BattleDay, fields)];
+			rec[_fieldName_MapNo] = values[getFieldIndex(_fieldName_MapNo, fields)];
+			rec[_fieldName_Date] = values[getFieldIndex(_fieldName_Date, fields)];
+			rec[_fieldName_Time] = values[getFieldIndex(_fieldName_Time, fields)];
+			rec[_fieldName_PanoView] = values[getFieldIndex(_fieldName_PanoView, fields)];
+			rec[_fieldName_POV] = values[getFieldIndex(_fieldName_POV, fields)];
+			rec[_fieldName_Description] = values[getFieldIndex(_fieldName_Description, fields)];
 			recs.push(rec);
 	
 		}	

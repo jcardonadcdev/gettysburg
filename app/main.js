@@ -6,11 +6,13 @@ dojo.require("esri.map");
 var TITLE = "Battle of Gettysburg"
 var BYLINE = "This is the byline"
 var BASEMAP_SERVICE_GETTYSBURG = "http://staging.storymaps.esri.com/arcgis/rest/services/Gettysburg/GettysburgBasemaps/MapServer";
-var SERVICE_TROOPS = "http://staging.storymaps.esri.com/arcgis/rest/services/Gettysburg/GettysburgTroops/MapServer";
+var SERVICE_TROOPS = "http://ec2-54-224-131-33.compute-1.amazonaws.com:6080/arcgis/rest/services/Gettysburg/GettysburgTroops2/MapServer";
 
 var SPREADSHEET_URL = "/proxy/proxy.ashx?https://docs.google.com/spreadsheet/pub?key=0ApQt3h4b9AptdERtNnRDQU9wLWlNX1cyMXQybmQ2TUE&output=csv";
 
 var SPREADSHEET_FIELDNAME_ID = "ID";
+var SPREADSHEET_FIELDNAME_LAYER = "Layer";
+var SPREADSHEET_FIELDNAME_FINISHED = "Finished";
 var SPREADSHEET_FIELDNAME_BATTLEDAY = "Battle Day";
 var SPREADSHEET_FIELDNAME_MAPNO = "Batchelder Map No.";
 var SPREADSHEET_FIELDNAME_DATE = "Date";
@@ -112,6 +114,8 @@ function init() {
 	$(serviceCSV).bind("complete", function() {	
 		var parser = new ParserMain(
 			SPREADSHEET_FIELDNAME_ID, 
+			SPREADSHEET_FIELDNAME_LAYER,
+			SPREADSHEET_FIELDNAME_FINISHED, 			
 			SPREADSHEET_FIELDNAME_BATTLEDAY,
 			SPREADSHEET_FIELDNAME_MAPNO,
 			SPREADSHEET_FIELDNAME_DATE,
@@ -129,6 +133,9 @@ function init() {
 		var current;
 		var tokens;
 		var img;
+		
+		_recsSpreadSheet = $.grep(_recsSpreadSheet, function(n, i){return n[SPREADSHEET_FIELDNAME_FINISHED].toLowerCase() == "yes"});
+		
 		$.each(_recsSpreadSheet, function(index, value){
 			tokens = value[SPREADSHEET_FIELDNAME_TIME24].split(":");
 			current = new Date(1863, 6, value[SPREADSHEET_FIELDNAME_BATTLEDAY], tokens[0], tokens[1], tokens[2]);
@@ -164,7 +171,7 @@ function init() {
 			$(".timepoint").attr("src", "resources/icons/Ltblu.png");
 			$(e.target).attr("src", "resources/icons/Red.png");
 			var index = $.inArray(e.target, $(".timepoint"));
-			stageTroops(index);		
+			stageTroops(_recsSpreadSheet[index][SPREADSHEET_FIELDNAME_LAYER]);		
 		});
 		
 	});
@@ -205,7 +212,7 @@ function initMap() {
 	
 }
 
-function stageTroops(index)
+function stageTroops(layerName)
 {
 	swap();
 	var handle = dojo.connect(_layerTroopsActive, "onUpdateEnd", function(e){
@@ -215,8 +222,10 @@ function stageTroops(index)
 		crossFade();
 		dojo.disconnect(handle)
 	});
-	_layerTroopsActive.setVisibleLayers(createVisibleLayers(index));
+	_layerTroopsActive.setVisibleLayers(createVisibleLayers(layerName));
 	_layerTroopsActive.setVisibility(true);
+	
+	/*
 	
 	_layerInfantryConfederate.clear();
 
@@ -238,6 +247,7 @@ function stageTroops(index)
 		}
 	);
 	
+	*/
 	
 	// remove all feature layers from the map
 	
@@ -273,9 +283,9 @@ function getSubLayers(index)
 	return subLayers;
 }
 
-function createVisibleLayers(index)
+function createVisibleLayers(layerName)
 {
-	var parentLayer = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.parentLayerId == -1})[index];
+	var parentLayer = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.name == layerName})[0];
 	var subLayers = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.parentLayerId == parentLayer.id});
 	var visibleLayers = [parentLayer.id];		
 	$.each(subLayers, function(index, value){visibleLayers.push(value.id)});

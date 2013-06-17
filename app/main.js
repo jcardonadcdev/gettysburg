@@ -13,6 +13,8 @@ var _map;
 var _layerTroopsActive;
 var _layerTroopsInactive;
 
+var _layerInfantryConfederate;
+
 var _dojoReady = false;
 var _jqueryReady = false;
 
@@ -77,7 +79,11 @@ function init() {
 	_layerTroopsInactive = new esri.layers.ArcGISDynamicMapServiceLayer(SERVICE_TROOPS);
 	_layerTroopsInactive.setVisibility(false);
 	_map.addLayer(_layerTroopsInactive);	
-
+	
+	_layerInfantryConfederate = new esri.layers.GraphicsLayer();
+	_map.addLayer(_layerInfantryConfederate);
+	dojo.connect(_layerInfantryConfederate, "onMouseOver", layer_onMouseOver);
+	dojo.connect(_layerInfantryConfederate, "onMouseOut", layer_onMouseOut);
 
 	if(_map.loaded){
 		initMap();
@@ -163,6 +169,60 @@ function stageTroops(index)
 	});
 	_layerTroopsActive.setVisibleLayers(createVisibleLayers(index));
 	_layerTroopsActive.setVisibility(true);
+	
+	_layerInfantryConfederate.clear();
+
+	var query = new esri.tasks.Query();
+	query.where = "1 = 1";
+	query.outSpatialReference = {wkid:102100}; 
+	query.returnGeometry = true;
+	query.outFields = ["*"];
+	
+	var queryTask = new esri.tasks.QueryTask(SERVICE_TROOPS+"/"+getSubLayers(index)[5].id);
+	queryTask.execute(
+		query, 
+		function(fs){
+			console.log(fs.features.length);
+			console.log(fs)
+		}, 
+		function(){
+			console.log("error")
+		}
+	);
+	
+	
+	// remove all feature layers from the map
+	
+	/*
+	
+	$.each(_map.graphicsLayerIds, function(index, value){
+		_map.removeLayer(_map.getLayer(value));
+	});
+
+	var layerInfantryConfederate = new esri.layers.FeatureLayer(SERVICE_TROOPS+"/"+getSubLayers(index)[5].id,{mode: esri.layers.FeatureLayer.MODE_SNAPSHOT});
+	_map.addLayer(layerInfantryConfederate);
+	dojo.connect(layerInfantryConfederate, "onMouseOver", layer_onMouseOver);
+	dojo.connect(layerInfantryConfederate, "onMouseOut", layer_onMouseOut);
+	
+	*/
+	
+	/*
+	var layerInfantryUnion = new esri.layers.FeatureLayer(SERVICE_TROOPS+"/"+getSubLayers(index)[6].id,{mode: esri.layers.FeatureLayer.MODE_SNAPSHOT});
+	_map.addLayer(layerInfantryUnion);
+	dojo.connect(layerInfantryUnion, "onUpdateEnd", function(error, info) {
+		console.log("confederate", error, info);		
+		dojo.connect(layerInfantryUnion, "onMouseOver", layer_onMouseOver);
+		dojo.connect(layerInfantryUnion, "onMouseOut", layer_onMouseOut);
+	})
+	*/
+
+}
+
+function getSubLayers(index)
+{
+	var parentLayer = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.parentLayerId == -1})[index];
+	var subLayers = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.parentLayerId == parentLayer.id});
+	return subLayers;
 }
 
 function createVisibleLayers(index)
@@ -189,15 +249,12 @@ function swap()
 	_layerTroopsActive = temp;
 }
 
-/*
-
-sample layer event code.
-
-function layerOV_onMouseOver(event) 
+function layer_onMouseOver(event) 
 {
 	if (_isMobile) return;
 	var graphic = event.graphic;
 	_map.setMapCursor("pointer");
+	/*
 	if ($.inArray(graphic, _selected) == -1) {
 		graphic.setSymbol(resizeSymbol(graphic.symbol, _lutBallIconSpecs.medium));
 	}
@@ -205,18 +262,27 @@ function layerOV_onMouseOver(event)
 	$("#hoverInfo").html("<b>"+graphic.attributes.getLanguage()+"</b>"+"<p>"+graphic.attributes.getRegion());
 	var pt = _map.toScreen(graphic.geometry);
 	hoverInfoPos(pt.x,pt.y);	
+	*/
 }
 
 
-function layerOV_onMouseOut(event) 
+function layer_onMouseOut(event) 
 {
 	var graphic = event.graphic;
 	_map.setMapCursor("default");
+	/*
 	$("#hoverInfo").hide();
 	if ($.inArray(graphic, _selected) == -1) {
 		graphic.setSymbol(resizeSymbol(graphic.symbol, _lutBallIconSpecs.tiny));
 	}
+	*/
 }
+
+
+/*
+
+sample layer event code.
+
 
 
 function layerOV_onClick(event) 

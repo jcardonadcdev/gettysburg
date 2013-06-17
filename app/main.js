@@ -134,7 +134,7 @@ function init() {
 		var tokens;
 		var img;
 		
-		_recsSpreadSheet = $.grep(_recsSpreadSheet, function(n, i){return n[SPREADSHEET_FIELDNAME_FINISHED].toLowerCase() == "yes"});
+		_recsSpreadSheet = $.grep(_recsSpreadSheet, function(n, i){return $.trim(n[SPREADSHEET_FIELDNAME_FINISHED]) != ""});
 		
 		$.each(_recsSpreadSheet, function(index, value){
 			tokens = value[SPREADSHEET_FIELDNAME_TIME24].split(":");

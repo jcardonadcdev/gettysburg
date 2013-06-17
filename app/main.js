@@ -17,6 +17,8 @@ var SPREADSHEET_FIELDNAME_MAPNO = "Batchelder Map No.";
 var SPREADSHEET_FIELDNAME_DATE = "Date";
 var SPREADSHEET_FIELDNAME_TIME = "Time";
 var SPREADSHEET_FIELDNAME_TIME24 = "Time24";
+var SPREADSHEET_FIELDNAME_HEADLINE = "Headline";
+var SPREADSHEET_FIELDNAME_TEXT = "Text";
 var SPREADSHEET_FIELDNAME_PANOVIEW = "Pano View";
 var SPREADSHEET_FIELDNAME_POV = "Point of View";
 var SPREADSHEET_FIELDNAME_DESCRIPTION = "Description";
@@ -119,7 +121,9 @@ function init() {
 			SPREADSHEET_FIELDNAME_MAPNO,
 			SPREADSHEET_FIELDNAME_DATE,
 			SPREADSHEET_FIELDNAME_TIME, 
-			SPREADSHEET_FIELDNAME_TIME24, 
+			SPREADSHEET_FIELDNAME_TIME24,
+			SPREADSHEET_FIELDNAME_HEADLINE, 
+			SPREADSHEET_FIELDNAME_TEXT, 			
 			SPREADSHEET_FIELDNAME_PANOVIEW,
 			SPREADSHEET_FIELDNAME_POV,
 			SPREADSHEET_FIELDNAME_DESCRIPTION
@@ -214,22 +218,32 @@ function initMap() {
 	
 }
 
+function setInfo(datetime, headline, text)
+{
+	$("#dateDiv").html(datetime);
+	$("#headline").html(headline);
+	$("#story").html(text);
+}
+
 function stageTroops(index)
 {
-	var layerName = _recsSpreadSheet[index][SPREADSHEET_FIELDNAME_LAYER]
+	var rec = _recsSpreadSheet[index]
+	var layerName = rec[SPREADSHEET_FIELDNAME_LAYER]
 	swap();
 	var handle = dojo.connect(_layerTroopsActive, "onUpdateEnd", function(e){
 		// for some reason, it's necessary to re-set the display to none; otherwise,
 		// the layer just turns on abruptly.
 		$(_layerTroopsActive._div).css("display", "none");
 		crossFade();
+		setInfo("JULY "+rec[SPREADSHEET_FIELDNAME_BATTLEDAY]+", "+rec[SPREADSHEET_FIELDNAME_TIME], 
+				rec[SPREADSHEET_FIELDNAME_HEADLINE], 
+				rec[SPREADSHEET_FIELDNAME_TEXT]);
 		dojo.disconnect(handle)
 	});
 	_layerTroopsActive.setVisibleLayers(createVisibleLayers(layerName));
 	_layerTroopsActive.setVisibility(true);
 	
 	/*
-	
 	_layerInfantryConfederate.clear();
 
 	var query = new esri.tasks.Query();

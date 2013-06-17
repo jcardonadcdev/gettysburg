@@ -4,7 +4,9 @@ function ParserMain(_fieldName_ID,
 					_fieldName_MapNo, 
 					_fieldName_Date, 
 					_fieldName_Time, 
-					_fieldName_Time24, 
+					_fieldName_Time24,
+					_fieldName_Headline,
+					_fieldName_Text,
 					_fieldName_PanoView, 
 					_fieldName_POV, 
 					_fieldName_Description)
@@ -38,6 +40,8 @@ function ParserMain(_fieldName_ID,
 			rec[_fieldName_Date] = values[getFieldIndex(_fieldName_Date, fields)];
 			rec[_fieldName_Time] = values[getFieldIndex(_fieldName_Time, fields)];
 			rec[_fieldName_Time24] = values[getFieldIndex(_fieldName_Time24, fields)];
+			rec[_fieldName_Headline] = values[getFieldIndex(_fieldName_Headline, fields)];
+			rec[_fieldName_Text] = values[getFieldIndex(_fieldName_Text, fields)];			
 			rec[_fieldName_PanoView] = values[getFieldIndex(_fieldName_PanoView, fields)];
 			rec[_fieldName_POV] = values[getFieldIndex(_fieldName_POV, fields)];
 			rec[_fieldName_Description] = values[getFieldIndex(_fieldName_Description, fields)];

@@ -1,6 +1,5 @@
 function ParserMain(_fieldName_ID, 
 					_fieldName_Layer,
-					_fieldName_Finished,
 					_fieldName_BattleDay, 
 					_fieldName_MapNo, 
 					_fieldName_Date, 
@@ -34,7 +33,6 @@ function ParserMain(_fieldName_ID,
 			rec = new Object();
 			rec[_fieldName_ID] = values[getFieldIndex(_fieldName_ID, fields)];
 			rec[_fieldName_Layer] = values[getFieldIndex(_fieldName_Layer, fields)];			
-			rec[_fieldName_Finished] = $.trim(values[getFieldIndex(_fieldName_Finished, fields)]);			
 			rec[_fieldName_BattleDay] = values[getFieldIndex(_fieldName_BattleDay, fields)];
 			rec[_fieldName_MapNo] = values[getFieldIndex(_fieldName_MapNo, fields)];
 			rec[_fieldName_Date] = values[getFieldIndex(_fieldName_Date, fields)];

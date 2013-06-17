@@ -12,7 +12,6 @@ var SPREADSHEET_URL = "/proxy/proxy.ashx?https://docs.google.com/spreadsheet/pub
 
 var SPREADSHEET_FIELDNAME_ID = "ID";
 var SPREADSHEET_FIELDNAME_LAYER = "Layer";
-var SPREADSHEET_FIELDNAME_FINISHED = "Finished";
 var SPREADSHEET_FIELDNAME_BATTLEDAY = "Battle Day";
 var SPREADSHEET_FIELDNAME_MAPNO = "Batchelder Map No.";
 var SPREADSHEET_FIELDNAME_DATE = "Date";
@@ -115,7 +114,6 @@ function init() {
 		var parser = new ParserMain(
 			SPREADSHEET_FIELDNAME_ID, 
 			SPREADSHEET_FIELDNAME_LAYER,
-			SPREADSHEET_FIELDNAME_FINISHED, 			
 			SPREADSHEET_FIELDNAME_BATTLEDAY,
 			SPREADSHEET_FIELDNAME_MAPNO,
 			SPREADSHEET_FIELDNAME_DATE,
@@ -134,7 +132,7 @@ function init() {
 		var tokens;
 		var img;
 		
-		_recsSpreadSheet = $.grep(_recsSpreadSheet, function(n, i){return $.trim(n[SPREADSHEET_FIELDNAME_FINISHED]) != ""});
+		_recsSpreadSheet = $.grep(_recsSpreadSheet, function(n, i){return $.trim(n[SPREADSHEET_FIELDNAME_LAYER]) != ""});
 		
 		$.each(_recsSpreadSheet, function(index, value){
 			tokens = value[SPREADSHEET_FIELDNAME_TIME24].split(":");

@@ -120,6 +120,7 @@ a:hover{
 	height:100%;
 	width:100%;
 	overflow:hidden;
+	background-image:url(../resources/images/background.jpg);
 }
 
 #hoverInfo{

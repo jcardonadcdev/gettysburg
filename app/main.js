@@ -23,6 +23,8 @@ var SPREADSHEET_FIELDNAME_PANOVIEW = "Pano View";
 var SPREADSHEET_FIELDNAME_POV = "Point of View";
 var SPREADSHEET_FIELDNAME_DESCRIPTION = "Description";
 
+var FIELDNAME_GENERALIZED_ARMY = "ARMY";
+
 var _recsSpreadSheet;
 var _selected = 0;
 
@@ -30,8 +32,6 @@ var _map;
 
 var _layerTroopsActive;
 var _layerTroopsInactive;
-
-var _layerInfantryConfederate;
 
 var _dojoReady = false;
 var _jqueryReady = false;
@@ -97,11 +97,6 @@ function init() {
 	_layerTroopsInactive = new esri.layers.ArcGISDynamicMapServiceLayer(SERVICE_TROOPS);
 	_layerTroopsInactive.setVisibility(false);
 	_map.addLayer(_layerTroopsInactive);	
-	
-	_layerInfantryConfederate = new esri.layers.GraphicsLayer();
-	_map.addLayer(_layerInfantryConfederate);
-	dojo.connect(_layerInfantryConfederate, "onMouseOver", layer_onMouseOver);
-	dojo.connect(_layerInfantryConfederate, "onMouseOut", layer_onMouseOut);
 
 	if(_map.loaded){
 		initMap();
@@ -203,16 +198,6 @@ function initMap() {
 	}
 	
 	setTimeout(function(){$(_layerTroopsInactive._div).fadeOut()}, 500);
-	
-	/*
-	
-	use this for layer interactivity
-	
-	dojo.connect(_layerOV, "onMouseOver", layerOV_onMouseOver);
-	dojo.connect(_layerOV, "onMouseOut", layerOV_onMouseOut);
-	dojo.connect(_layerOV, "onClick", layerOV_onClick);		
-	*/
-		
 	handleWindowResize();
 	setTimeout(function(){_map.setExtent(_homeExtent);$("#whiteOut").fadeOut()},500);
 	
@@ -227,6 +212,7 @@ function setInfo(datetime, headline, text)
 
 function stageTroops(index)
 {
+
 	var rec = _recsSpreadSheet[index]
 	var layerName = rec[SPREADSHEET_FIELDNAME_LAYER]
 	swap();
@@ -243,59 +229,27 @@ function stageTroops(index)
 	_layerTroopsActive.setVisibleLayers(createVisibleLayers(layerName));
 	_layerTroopsActive.setVisibility(true);
 	
-	/*
-	_layerInfantryConfederate.clear();
-
-	var query = new esri.tasks.Query();
-	query.where = "1 = 1";
-	query.outSpatialReference = {wkid:102100}; 
-	query.returnGeometry = true;
-	query.outFields = ["*"];
-	
-	var queryTask = new esri.tasks.QueryTask(SERVICE_TROOPS+"/"+getSubLayers(index)[5].id);
-	queryTask.execute(
-		query, 
-		function(fs){
-			console.log(fs.features.length);
-			console.log(fs)
-		}, 
-		function(){
-			console.log("error")
-		}
-	);
-	
-	*/
-	
 	// remove all feature layers from the map
-	
-	/*
-	
+		
 	$.each(_map.graphicsLayerIds, function(index, value){
 		_map.removeLayer(_map.getLayer(value));
 	});
 
-	var layerInfantryConfederate = new esri.layers.FeatureLayer(SERVICE_TROOPS+"/"+getSubLayers(index)[5].id,{mode: esri.layers.FeatureLayer.MODE_SNAPSHOT});
-	_map.addLayer(layerInfantryConfederate);
-	dojo.connect(layerInfantryConfederate, "onMouseOver", layer_onMouseOver);
-	dojo.connect(layerInfantryConfederate, "onMouseOut", layer_onMouseOut);
-	
-	*/
-	
-	/*
-	var layerInfantryUnion = new esri.layers.FeatureLayer(SERVICE_TROOPS+"/"+getSubLayers(index)[6].id,{mode: esri.layers.FeatureLayer.MODE_SNAPSHOT});
-	_map.addLayer(layerInfantryUnion);
-	dojo.connect(layerInfantryUnion, "onUpdateEnd", function(error, info) {
-		console.log("confederate", error, info);		
-		dojo.connect(layerInfantryUnion, "onMouseOver", layer_onMouseOver);
-		dojo.connect(layerInfantryUnion, "onMouseOut", layer_onMouseOut);
-	})
-	*/
+	var generalizedLayerID = getSubLayers(layerName)[0].subLayerIds[0]
+	var generalizedLayerInfo = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.id == generalizedLayerID})[0];
+	var generalizedLayerIndex = $.inArray(generalizedLayerInfo, _layerTroopsActive.layerInfos);
+
+	var layerGeneralized = new esri.layers.FeatureLayer(SERVICE_TROOPS+"/"+generalizedLayerIndex,{mode: esri.layers.FeatureLayer.MODE_SNAPSHOT});
+	layerGeneralized.setOpacity(0.2);
+	_map.addLayer(layerGeneralized);
+	dojo.connect(layerGeneralized, "onMouseOver", layer_onMouseOver);
+	dojo.connect(layerGeneralized, "onMouseOut", layer_onMouseOut);
 
 }
 
-function getSubLayers(index)
+function getSubLayers(layerName)
 {
-	var parentLayer = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.parentLayerId == -1})[index];
+	var parentLayer = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.name == layerName})[0];
 	var subLayers = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.parentLayerId == parentLayer.id});
 	return subLayers;
 }
@@ -328,25 +282,24 @@ function layer_onMouseOver(event)
 {
 	if (_isMobile) return;
 	var graphic = event.graphic;
-	_map.setMapCursor("pointer");
+	$("#hoverInfo").html("<b>"+graphic.attributes[FIELDNAME_GENERALIZED_ARMY]+"</b>");
+	hoverInfoPos(event.offsetX, event.offsetY);	
 	/*
 	if ($.inArray(graphic, _selected) == -1) {
 		graphic.setSymbol(resizeSymbol(graphic.symbol, _lutBallIconSpecs.medium));
 	}
 	if (!_isIE) moveGraphicToFront(graphic);	
-	$("#hoverInfo").html("<b>"+graphic.attributes.getLanguage()+"</b>"+"<p>"+graphic.attributes.getRegion());
-	var pt = _map.toScreen(graphic.geometry);
-	hoverInfoPos(pt.x,pt.y);	
 	*/
 }
 
 
 function layer_onMouseOut(event) 
 {
+	$("#hoverInfo").hide();
+
+	/*
 	var graphic = event.graphic;
 	_map.setMapCursor("default");
-	/*
-	$("#hoverInfo").hide();
 	if ($.inArray(graphic, _selected) == -1) {
 		graphic.setSymbol(resizeSymbol(graphic.symbol, _lutBallIconSpecs.tiny));
 	}
@@ -354,6 +307,21 @@ function layer_onMouseOut(event)
 }
 
 
+function hoverInfoPos(x,y){
+	if (x <= ($("#map").width())-230){
+		$("#hoverInfo").css("left",x+15);
+	}
+	else{
+		$("#hoverInfo").css("left",x-25-($("#hoverInfo").width()));
+	}
+	if (y >= ($("#hoverInfo").height())+50){
+		$("#hoverInfo").css("top",y-35-($("#hoverInfo").height()));
+	}
+	else{
+		$("#hoverInfo").css("top",y-15+($("#hoverInfo").height()));
+	}
+	$("#hoverInfo").show();
+}
 /*
 
 sample layer event code.
@@ -386,21 +354,6 @@ function moveGraphicToFront(graphic)
 	if (dojoShape) dojoShape.moveToFront();
 }
 
-function hoverInfoPos(x,y){
-	if (x <= ($("#map").width())-230){
-		$("#hoverInfo").css("left",x+15);
-	}
-	else{
-		$("#hoverInfo").css("left",x-25-($("#hoverInfo").width()));
-	}
-	if (y >= ($("#hoverInfo").height())+50){
-		$("#hoverInfo").css("top",y-35-($("#hoverInfo").height()));
-	}
-	else{
-		$("#hoverInfo").css("top",y-15+($("#hoverInfo").height()));
-	}
-	$("#hoverInfo").show();
-}
 
 */
 

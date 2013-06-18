@@ -5,7 +5,7 @@ dojo.require("esri.map");
 
 var TITLE = "Battle of Gettysburg"
 var BYLINE = "This is the byline"
-var BASEMAP_SERVICE_GETTYSBURG = "http://staging.storymaps.esri.com/arcgis/rest/services/Gettysburg/GettysburgBasemaps/MapServer";
+var BASEMAP_SERVICE_GETTYSBURG = "http://ec2-54-224-131-33.compute-1.amazonaws.com:6080/arcgis/rest/services/Gettysburg/GettysburgBasemapsTight/MapServer";
 var SERVICE_TROOPS = "http://ec2-54-224-131-33.compute-1.amazonaws.com:6080/arcgis/rest/services/Gettysburg/GettysburgTroops2/MapServer";
 
 var SPREADSHEET_URL = "/proxy/proxy.ashx?https://docs.google.com/spreadsheet/pub?key=0ApQt3h4b9AptdERtNnRDQU9wLWlNX1cyMXQybmQ2TUE&output=csv";
@@ -231,11 +231,14 @@ function stageTroops(index)
 	
 	// remove all feature layers from the map
 		
-	$.each(_map.graphicsLayerIds, function(index, value){
+	var layerIDs = _map.graphicsLayerIds.slice(0);	
+	$.each(layerIDs, function(index, value){
 		_map.removeLayer(_map.getLayer(value));
 	});
+	
+	var subLayers = getSubLayers(layerName)
 
-	var generalizedLayerID = getSubLayers(layerName)[0].subLayerIds[0]
+	var generalizedLayerID = subLayers[0].subLayerIds[0]
 	var generalizedLayerInfo = $.grep(_layerTroopsActive.layerInfos, function(n, i){return n.id == generalizedLayerID})[0];
 	var generalizedLayerIndex = $.inArray(generalizedLayerInfo, _layerTroopsActive.layerInfos);
 
@@ -245,6 +248,18 @@ function stageTroops(index)
 	dojo.connect(layerGeneralized, "onMouseOver", layer_onMouseOver);
 	dojo.connect(layerGeneralized, "onMouseOut", layer_onMouseOut);
 
+	var memberIDs = subLayers[1].subLayerIds;
+	var layerInfos = $.grep(_layerTroopsActive.layerInfos, function(n, i){return $.inArray(n.id, memberIDs) != -1});
+	var layerInfo = $.grep(layerInfos, function(n, i){return n.name.indexOf("CONFED_inf") != -1})[0];
+	var index = $.inArray(layerInfo, _layerTroopsActive.layerInfos);
+	
+	var layerConfederateInfantry = new esri.layers.FeatureLayer(SERVICE_TROOPS+"/"+index,{mode: esri.layers.FeatureLayer.MODE_SNAPSHOT, outFields:["*"]});
+	layerConfederateInfantry.setOpacity(0.2);
+	layerConfederateInfantry.minScale = 36111;
+	_map.addLayer(layerConfederateInfantry);
+	dojo.connect(layerConfederateInfantry, "onMouseOver", layer_onMouseOver);
+	dojo.connect(layerConfederateInfantry, "onMouseOut", layer_onMouseOut);
+	
 }
 
 function getSubLayers(layerName)
@@ -282,7 +297,12 @@ function layer_onMouseOver(event)
 {
 	if (_isMobile) return;
 	var graphic = event.graphic;
-	$("#hoverInfo").html("<b>"+graphic.attributes[FIELDNAME_GENERALIZED_ARMY]+"</b>");
+	console.log(graphic.attributes);
+	if (graphic.attributes[FIELDNAME_GENERALIZED_ARMY]) {
+		$("#hoverInfo").html("<b>"+graphic.attributes[FIELDNAME_GENERALIZED_ARMY]+"</b>");
+	} else {
+		$("#hoverInfo").html("<b>"+graphic.attributes["BRIGADE_CO"]+"</b>");
+	}
 	hoverInfoPos(event.offsetX, event.offsetY);	
 	/*
 	if ($.inArray(graphic, _selected) == -1) {

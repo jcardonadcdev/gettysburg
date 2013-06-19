@@ -110,54 +110,7 @@ function init() {
 	var serviceCSV = new CSVService();
 	$(serviceCSV).bind("complete", function() {	
 		_recsSpreadSheet = parseSpreadsheet(serviceCSV.getLines());
-		var begin = new Date(1863, 6, 1, 0, 0 , 0, 0);
-		var end = new Date(1863, 6, 4, 0, 0 , 0, 0);
-		var diff = (end.getTime() - begin.getTime())/1000;
-		
-		var current;
-		var tokens;
-		var img;
-		
-		_recsSpreadSheet = $.grep(_recsSpreadSheet, function(n, i){return $.trim(n[SPREADSHEET_FIELDNAME_LAYER]) != ""});
-		
-		$.each(_recsSpreadSheet, function(index, value){
-			tokens = value[SPREADSHEET_FIELDNAME_TIME24].split(":");
-			current = new Date(1863, 6, value[SPREADSHEET_FIELDNAME_BATTLEDAY], tokens[0], tokens[1], tokens[2]);
-			img = $("<img></img>");
-			$(img).attr("src", "resources/icons/Ltblu.png");
-			$(img).css("top", parseInt((((current.getTime() - begin.getTime()) / 1000) / diff) * 100).toString()+"%");
-			$(img).addClass("timepoint");
-			$("#days").append(img);
-		});
-
-		$(".timepoint").mouseover(function(e) {
-			if (_isMobile) return;
-			$(e.target).width(40);
-			$(e.target).height(28);		
-			$(e.target).css("margin-left", -20);		
-			$(e.target).css("margin-top", -14);								
-			/*
-			if (!_isIE) moveGraphicToFront(graphic);	
-			$("#hoverInfo").html("<b>"+graphic.attributes.getLanguage()+"</b>"+"<p>"+graphic.attributes.getRegion());
-			var pt = _map.toScreen(graphic.geometry);
-			hoverInfoPos(pt.x,pt.y);	
-			*/
-		});
-		
-		$(".timepoint").mouseout(function(e) {
-			$(e.target).width(30);
-			$(e.target).height(21);		
-			$(e.target).css("margin-left", -15);		
-			$(e.target).css("margin-top", -10);								
-		});
-		
-		$(".timepoint").click(function(e) {
-			$(".timepoint").attr("src", "resources/icons/Ltblu.png");
-			$(e.target).attr("src", "resources/icons/Red.png");
-			_selected = $.inArray(e.target, $(".timepoint"));
-			stageTroops(_selected);		
-		});
-		
+		placeTimePoints();		
 		$($(".timepoint")[_selected]).attr("src", "resources/icons/Red.png");
 		stageTroops(_selected);
 		
@@ -206,6 +159,52 @@ function parseSpreadsheet(lines)
 		SPREADSHEET_FIELDNAME_DESCRIPTION
 	);
 	return parser.getRecs(lines);
+}
+
+function placeTimePoints()
+{
+	var begin = new Date(1863, 6, 1, 0, 0 , 0, 0);
+	var end = new Date(1863, 6, 4, 0, 0 , 0, 0);
+	var diff = (end.getTime() - begin.getTime())/1000;
+	
+	var current;
+	var tokens;
+	var img;
+	
+	_recsSpreadSheet = $.grep(_recsSpreadSheet, function(n, i){return $.trim(n[SPREADSHEET_FIELDNAME_LAYER]) != ""});
+	
+	$.each(_recsSpreadSheet, function(index, value){
+		tokens = value[SPREADSHEET_FIELDNAME_TIME24].split(":");
+		current = new Date(1863, 6, value[SPREADSHEET_FIELDNAME_BATTLEDAY], tokens[0], tokens[1], tokens[2]);
+		img = $("<img></img>");
+		$(img).attr("src", "resources/icons/Ltblu.png");
+		$(img).css("top", parseInt((((current.getTime() - begin.getTime()) / 1000) / diff) * 100).toString()+"%");
+		$(img).addClass("timepoint");
+		$("#days").append(img);
+	});
+
+	$(".timepoint").mouseover(function(e) {
+		if (_isMobile) return;
+		$(e.target).width(40);
+		$(e.target).height(28);		
+		$(e.target).css("margin-left", -20);		
+		$(e.target).css("margin-top", -14);								
+	});
+	
+	$(".timepoint").mouseout(function(e) {
+		$(e.target).width(30);
+		$(e.target).height(21);		
+		$(e.target).css("margin-left", -15);		
+		$(e.target).css("margin-top", -10);								
+	});
+	
+	$(".timepoint").click(function(e) {
+		$(".timepoint").attr("src", "resources/icons/Ltblu.png");
+		$(e.target).attr("src", "resources/icons/Red.png");
+		_selected = $.inArray(e.target, $(".timepoint"));
+		stageTroops(_selected);		
+	});
+	
 }
 
 function setInfo(datetime, headline, text)

@@ -92,34 +92,42 @@ function init() {
 	_map.addLayer(layerBasemap);
 	
 	_layerTroopsActive = new esri.layers.ArcGISDynamicMapServiceLayer(SERVICE_TROOPS);
+	dojo.connect(_layerTroopsActive, "onLoad", function(layer){
+		finishInit();
+	});
 	_map.addLayer(_layerTroopsActive);	
 	
 	_layerTroopsInactive = new esri.layers.ArcGISDynamicMapServiceLayer(SERVICE_TROOPS);
+	dojo.connect(_layerTroopsInactive, "onLoad", function(layer){
+		finishInit();
+	});
 	_layerTroopsInactive.setVisibility(false);
 	_map.addLayer(_layerTroopsInactive);	
 
 	if(_map.loaded){
-		initMap();
+		finishInit();
 	} else {
 		dojo.connect(_map,"onLoad",function(){
-			initMap();
+			finishInit();
 		});
 	}
-	
-	
+		
 	var serviceCSV = new CSVService();
 	$(serviceCSV).bind("complete", function() {	
 		_recsSpreadSheet = parseSpreadsheet(serviceCSV.getLines());
 		placeTimePoints();		
 		$($(".timepoint")[_selected]).attr("src", "resources/icons/Red.png");
-		stageTroops(_selected);
-		
+		finishInit();
 	});
 	serviceCSV.process(SPREADSHEET_URL);
 	
 }
 
-function initMap() {
+function finishInit()
+{
+	if (!(_map.loaded && _layerTroopsActive.loaded && _layerTroopsInactive.loaded && _recsSpreadSheet)) return false;
+	
+	stageTroops(_selected)
 	
 	// if _homeExtent hasn't been set, then default to the initial extent
 	// of the web map.  On the other hand, if it HAS been set AND we're using
@@ -139,7 +147,7 @@ function initMap() {
 	setTimeout(function(){$(_layerTroopsInactive._div).fadeOut()}, 500);
 	handleWindowResize();
 	setTimeout(function(){_map.setExtent(_homeExtent);$("#whiteOut").fadeOut()},500);
-	
+
 }
 
 function parseSpreadsheet(lines)
@@ -216,7 +224,6 @@ function setInfo(datetime, headline, text)
 
 function stageTroops(index)
 {
-
 	var rec = _recsSpreadSheet[index]
 	var layerName = rec[SPREADSHEET_FIELDNAME_LAYER]
 	swap();

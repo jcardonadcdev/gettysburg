@@ -5,7 +5,7 @@ dojo.require("esri.map");
 
 var TITLE = "Battle of Gettysburg"
 var BYLINE = "This is the byline"
-var BASEMAP_SERVICE_GETTYSBURG = "http://ec2-54-224-131-33.compute-1.amazonaws.com:6080/arcgis/rest/services/Gettysburg/GettysburgBasemaps/MapServer";
+var BASEMAP_SERVICE_GETTYSBURG = "http://ec2-54-224-131-33.compute-1.amazonaws.com:6080/arcgis/rest/services/Gettysburg/GettysburgBasemapsTight/MapServer";
 var SERVICE_TROOPS = "http://ec2-54-224-131-33.compute-1.amazonaws.com:6080/arcgis/rest/services/Gettysburg/GettysburgTroops2/MapServer";
 
 var SPREADSHEET_URL = "/proxy/proxy.ashx?https://docs.google.com/spreadsheet/pub?key=0ApQt3h4b9AptdERtNnRDQU9wLWlNX1cyMXQybmQ2TUE&output=csv";
@@ -109,21 +109,7 @@ function init() {
 	
 	var serviceCSV = new CSVService();
 	$(serviceCSV).bind("complete", function() {	
-		var parser = new ParserMain(
-			SPREADSHEET_FIELDNAME_ID, 
-			SPREADSHEET_FIELDNAME_LAYER,
-			SPREADSHEET_FIELDNAME_BATTLEDAY,
-			SPREADSHEET_FIELDNAME_MAPNO,
-			SPREADSHEET_FIELDNAME_DATE,
-			SPREADSHEET_FIELDNAME_TIME, 
-			SPREADSHEET_FIELDNAME_TIME24,
-			SPREADSHEET_FIELDNAME_HEADLINE, 
-			SPREADSHEET_FIELDNAME_TEXT, 			
-			SPREADSHEET_FIELDNAME_PANOVIEW,
-			SPREADSHEET_FIELDNAME_POV,
-			SPREADSHEET_FIELDNAME_DESCRIPTION
-		);
-		_recsSpreadSheet = parser.getRecs(serviceCSV.getLines());
+		_recsSpreadSheet = parseSpreadsheet(serviceCSV.getLines());
 		var begin = new Date(1863, 6, 1, 0, 0 , 0, 0);
 		var end = new Date(1863, 6, 4, 0, 0 , 0, 0);
 		var diff = (end.getTime() - begin.getTime())/1000;
@@ -201,6 +187,25 @@ function initMap() {
 	handleWindowResize();
 	setTimeout(function(){_map.setExtent(_homeExtent);$("#whiteOut").fadeOut()},500);
 	
+}
+
+function parseSpreadsheet(lines)
+{
+	var parser = new ParserMain(
+		SPREADSHEET_FIELDNAME_ID, 
+		SPREADSHEET_FIELDNAME_LAYER,
+		SPREADSHEET_FIELDNAME_BATTLEDAY,
+		SPREADSHEET_FIELDNAME_MAPNO,
+		SPREADSHEET_FIELDNAME_DATE,
+		SPREADSHEET_FIELDNAME_TIME, 
+		SPREADSHEET_FIELDNAME_TIME24,
+		SPREADSHEET_FIELDNAME_HEADLINE, 
+		SPREADSHEET_FIELDNAME_TEXT, 			
+		SPREADSHEET_FIELDNAME_PANOVIEW,
+		SPREADSHEET_FIELDNAME_POV,
+		SPREADSHEET_FIELDNAME_DESCRIPTION
+	);
+	return parser.getRecs(lines);
 }
 
 function setInfo(datetime, headline, text)
